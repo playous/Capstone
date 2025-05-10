@@ -1,13 +1,18 @@
 package capstone.demo.service;
 
+import capstone.demo.domain.SecurityCriterion;
 import capstone.demo.domain.User;
 import capstone.demo.dto.CreateUserDto;
+import capstone.demo.repository.SecurityCriterionRepository;
 import capstone.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -16,11 +21,20 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SecurityCriterionRepository securityCriterionRepository;
+
 
     @Transactional
     public long saveUser(CreateUserDto createUserDto) {
         User user = dtoToUser(createUserDto);
         userRepository.save(user);
+
+        List<SecurityCriterion> defaultCriteria = Arrays.asList(
+                createCriterion(user, "개인정보", 3),
+                createCriterion(user, "내부 행사", 1)
+        );
+
+        securityCriterionRepository.saveAll(defaultCriteria);
         return user.getId();
     }
 
@@ -56,6 +70,14 @@ public class UserService {
         String userId = createUserDto.getUserId();
         User user = userRepository.findUserByUserId(userId);
         return user.getId();
+    }
+
+    private SecurityCriterion createCriterion(User user, String name, Integer importance) {
+        SecurityCriterion criterion = new SecurityCriterion();
+        criterion.setUser(user);
+        criterion.setCriterionName(name);
+        criterion.setImportance(importance);
+        return criterion;
     }
 
 }
