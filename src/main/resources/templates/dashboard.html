@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>문서 보안 등급 평가 시스템 - 대시보드</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <!-- 상단 네비게이션 -->
+    <div class="top-nav">
+        <div class="logo">
+            <div class="logo-icon"></div>
+            <div class="logo-text" th:text="${user.company}">회사명</div>
+        </div>
+        <div class="nav-actions">
+            <div class="user-profile">
+                <div class="avatar"></div>
+                <span th:text="${user.name}">관리자</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 메인 대시보드 -->
+    <div class="main-container">
+        <!-- 왼쪽 사이드바 -->
+        <div class="sidebar">
+            <div class="sidebar-menu">
+                <a th:href="@{/dashboard}" class="menu-item active">
+                    <div class="menu-item-icon">📊</div>
+                    대시보드
+                </a>
+                <a th:href="@{/docs}" class="menu-item">
+                    <div class="menu-item-icon">📄</div>
+                    문서 관리
+                </a>
+                <a th:href="@{/docs/upload}" class="menu-item">
+                    <div class="menu-item-icon">📤</div>
+                    문서 업로드
+                </a>
+                <a th:href="@{/settings}" class="menu-item">
+                    <div class="menu-item-icon">🔧</div>
+                    보안 기준 관리
+                </a>
+            </div>
+        </div>
+        
+        <!-- 메인 콘텐츠 -->
+        <div class="content">
+            <!-- 알림 메시지 -->
+            <div th:if="${message}" class="alert" th:classappend="${messageType == 'error' ? 'alert-error' : 'alert-success'}">
+                <p th:text="${message}">알림 메시지</p>
+            </div>
+            
+            <div class="page-title">대시보드</div>
+            
+            <div class="welcome-banner">
+                <div class="welcome-title" th:text="'안녕하세요, ' + ${user != null ? user.name : '사용자'} + '님!'">안녕하세요!</div>
+                <div class="welcome-text">문서 보안 등급 평가 시스템에 오신 것을 환영합니다. 이 시스템을 통해 문서의 보안 등급을 자동으로 분류하고 관리할 수 있습니다.</div>
+            </div>
+            
+            <!-- 보안 등급 통계 -->
+            <div class="stats-container">
+                <div class="stats-title">보안 등급 통계</div>
+                <div class="stats-grid">
+                    <div class="stats-card">
+                        <div class="stats-number" th:text="${securityLevelCounts[0]}">0</div>
+                        <div class="stats-label">1등급 문서</div>
+                        <div class="security-indicator security-1"></div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-number" th:text="${securityLevelCounts[1]}">0</div>
+                        <div class="stats-label">2등급 문서</div>
+                        <div class="security-indicator security-2"></div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-number" th:text="${securityLevelCounts[2]}">0</div>
+                        <div class="stats-label">3등급 문서</div>
+                        <div class="security-indicator security-3"></div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-number" th:text="${securityLevelCounts[3]}">0</div>
+                        <div class="stats-label">4등급 문서</div>
+                        <div class="security-indicator security-4"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 최근 문서 목록 -->
+            <div class="recent-documents">
+                <div class="section-header">
+                    <div class="section-title">최근 분석된 문서</div>
+                    <a th:href="@{/docs}" class="view-all-link">전체 보기</a>
+                </div>
+                
+                <div th:if="${recentDocuments.empty}" class="empty-state">
+                    <div class="empty-icon">📄</div>
+                    <div class="empty-text">분석된 문서가 없습니다.</div>
+                    <a th:href="@{/docs/upload}" class="action-button">문서 업로드하기</a>
+                </div>
+                
+                <div th:if="${!recentDocuments.empty}" class="document-list">
+                    <div th:each="doc : ${recentDocuments}" class="document-item">
+                        <div class="document-icon">📄</div>
+                        <div class="document-info">
+                            <div class="document-title" th:text="${doc.title}">문서 제목</div>
+                            <div class="document-meta">
+                                <span th:text="${#temporals.format(doc.createdAt, 'yyyy-MM-dd')}">2025-04-28</span>
+                                <span class="security-tag" th:classappend="'security-' + ${doc.level}" th:text="${doc.level}">3</span>
+                            </div>
+                        </div>
+                        <a th:href="@{/docs/view/{id}(id=${doc.documentId})}" class="document-action">보기</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        .stats-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stats-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+        
+        .stats-card {
+            background-color: #F9FAFC;
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stats-number {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stats-label {
+            font-size: 14px;
+            color: #718096;
+        }
+        
+        .security-indicator {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+        
+        .security-1 {
+            background-color: #10B981;
+        }
+        
+        .security-2 {
+            background-color: #3B82F6;
+        }
+        
+        .security-3 {
+            background-color: #F59E0B;
+        }
+        
+        .security-4 {
+            background-color: #EF4444;
+        }
+        
+        .recent-documents {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .view-all-link {
+            font-size: 14px;
+            color: #8A4FFF;
+            text-decoration: none;
+        }
+        
+        .document-list {
+            display: grid;
+            gap: 10px;
+        }
+        
+        .document-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: #F9FAFC;
+            border-radius: 8px;
+        }
+        
+        .document-icon {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        
+        .document-info {
+            flex: 1;
+        }
+        
+        .document-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .document-meta {
+            font-size: 12px;
+            color: #718096;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .document-action {
+            padding: 6px 12px;
+            border-radius: 4px;
+            background-color: #F0E7FF;
+            color: #8A4FFF;
+            font-size: 12px;
+            text-decoration: none;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 0;
+        }
+        
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #CBD5E0;
+        }
+        
+        .empty-text {
+            font-size: 16px;
+            color: #718096;
+            margin-bottom: 20px;
+        }
+        
+        .action-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #8A4FFF;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+    </style>
+</body>
+</html>
