@@ -27,8 +27,6 @@ public class Document {
     private String contentType;        // 콘텐츠 타입
     private Long fileSize;             // 파일 크기 (바이트)
 
-    private Long documentName;
-
     private Integer level; // 보안 등급 (1-4)
 
     private LocalDateTime createdAt;
@@ -36,7 +34,7 @@ public class Document {
     @OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
     private List<SecurityElement> securityElements = new ArrayList<>();
 
-    // 문서 제목, 상태 등 추가 필드
+    // 문서 제목
     private String title;
 
     @Enumerated(EnumType.STRING)
