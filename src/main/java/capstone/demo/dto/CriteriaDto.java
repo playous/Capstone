@@ -8,7 +8,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class CriteriaDto {
 
-    @NotBlank(message = "보안 기준명을 입력해주세요.")
+    @NotBlank(message = "보안 요소를 입력해주세요.")
     private String name;
     private Integer importance;
 }
