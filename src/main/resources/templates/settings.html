@@ -52,15 +52,21 @@
             <p th:text="${message}">알림 메시지</p>
         </div>
 
+        <!-- 유효성 검사 오류 메시지 (새로 추가한 기준 관련) -->
+        <div th:if="${validationError}" class="alert alert-error">
+            <p>보안 기준명을 입력해주세요.</p>
+        </div>
+
         <div class="page-title">보안 기준 관리</div>
 
         <!-- 보안 기준 설정 -->
         <div class="customization-area" id="criteriaTab">
             <div class="section-title">문서 보안 기준 설정</div>
-            <p>각 문서 요소별로 보안 중요도를 설정하세요. 이 기준에 따라 문서의 등급이 자동으로 분류됩니다.</p>
+            <p>각 요소별로 보안 중요도를 설정하세요. 이 기준에 따라 문서의 등급이 자동으로 분류됩니다.</p>
 
-            <form th:action="@{/settings/save}" method="post">
+            <form th:action="@{/settings/save}" method="post" id="criteriaForm">
                 <div class="criteria-list">
+                    <!-- 기존 기준들 (데이터베이스에서 가져온 것) -->
                     <div class="criteria-item" th:each="criteria, stat : ${criteria}">
                         <input type="hidden" th:name="${'criteriaList[' + stat.index + '].name'}"
                                th:value="${criteria.name}">
@@ -75,6 +81,8 @@
                             <button type="button" class="toolbar-button criteria-delete">삭제</button>
                         </div>
                     </div>
+
+                    <!-- 새로 추가된 기준들은 여기에 JavaScript로 추가됩니다 -->
                 </div>
 
                 <button type="button" class="add-criteria-button">+ 새 보안 기준 추가</button>
@@ -86,11 +94,50 @@
 
 <script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', function() {
+        const criteriaForm = document.getElementById('criteriaForm');
+
+        // 폼 제출 전 검증
+        criteriaForm.addEventListener('submit', function(e) {
+            // 모든 입력 필드 확인
+            const inputs = document.querySelectorAll('.criteria-name-input');
+            let hasEmptyField = false;
+
+            inputs.forEach(input => {
+                if (!input.value.trim()) {
+                    hasEmptyField = true;
+                    input.classList.add('is-invalid');
+                    // 해당 입력 필드 아래 오류 메시지 표시
+                    const errorSpan = input.nextElementSibling;
+                    if (errorSpan && errorSpan.classList.contains('field-error')) {
+                        errorSpan.style.display = 'block';
+                    } else {
+                        const newErrorSpan = document.createElement('span');
+                        newErrorSpan.className = 'field-error';
+                        newErrorSpan.textContent = '보안 기준명을 입력해주세요.';
+                        input.parentNode.insertBefore(newErrorSpan, input.nextSibling);
+                    }
+                }
+            });
+
+            if (hasEmptyField) {
+                e.preventDefault(); // 제출 중지
+                // 스크롤을 첫 번째 오류 필드로 이동
+                const firstErrorField = document.querySelector('.is-invalid');
+                if (firstErrorField) {
+                    firstErrorField.focus();
+                    firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        });
+
         // 기준 삭제 버튼
         document.querySelectorAll('.criteria-delete').forEach(button => {
             button.addEventListener('click', function() {
                 const criteriaItem = this.closest('.criteria-item');
                 criteriaItem.remove();
+
+                // 인덱스 재조정
+                reindexFormElements();
             });
         });
 
@@ -108,13 +155,14 @@
             newItem.className = 'criteria-item';
             newItem.innerHTML = `
                     <div class="criteria-name">
-                        <input type="text" class="criteria-name-input" name="criteriaList[${newIndex}].name" placeholder="보안 기준명 입력" style="border: 1px solid #E2E8F0; padding: 6px 10px; border-radius: 4px; width: 200px; background-color: #F9FAFC;">
+                        <input type="text" class="criteria-name-input" name="criteriaList[${newIndex}].name" placeholder="보안 요소 입력" style="border: 1px solid #E2E8F0; padding: 6px 10px; border-radius: 4px; width: 200px; background-color: #F9FAFC;">
+                        <span class="field-error" style="display: none;">보안 요소를 입력해주세요.</span>
                     </div>
                     <div class="criteria-controls">
                         <select class="criteria-select" name="criteriaList[${newIndex}].importance">
-                            <option value="1">중요도1 - 낮음</option>
+                            <option value="1" selected>중요도1 - 낮음</option>
                             <option value="2">중요도2 - 보통</option>
-                            <option value="3" selected>중요도3 - 높음</option>
+                            <option value="3">중요도3 - 높음</option>
                         </select>
                         <button type="button" class="toolbar-button criteria-delete">삭제</button>
                     </div>
@@ -125,11 +173,47 @@
             // 새로 추가된 삭제 버튼에 이벤트 연결
             newItem.querySelector('.criteria-delete').addEventListener('click', function() {
                 newItem.remove();
+
+                // 인덱스 재조정
+                reindexFormElements();
+            });
+
+            // 입력 필드에 이벤트 추가
+            const inputField = newItem.querySelector('.criteria-name-input');
+
+            // 입력 시 에러 스타일 제거
+            inputField.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    this.classList.remove('is-invalid');
+                    const errorSpan = this.nextElementSibling;
+                    if (errorSpan && errorSpan.classList.contains('field-error')) {
+                        errorSpan.style.display = 'none';
+                    }
+                }
             });
 
             // 입력 필드에 포커스
-            newItem.querySelector('.criteria-name-input').focus();
+            inputField.focus();
         });
+
+        // 폼 요소 인덱스 재정렬 함수
+        function reindexFormElements() {
+            const criteriaItems = document.querySelectorAll('.criteria-item');
+
+            criteriaItems.forEach((item, index) => {
+                // 이름 필드 업데이트
+                const nameInput = item.querySelector('.criteria-name-input, input[type="hidden"]');
+                if (nameInput) {
+                    nameInput.name = `criteriaList[${index}].name`;
+                }
+
+                // 중요도 셀렉트 박스 업데이트
+                const importanceSelect = item.querySelector('.criteria-select');
+                if (importanceSelect) {
+                    importanceSelect.name = `criteriaList[${index}].importance`;
+                }
+            });
+        }
     });
 </script>
 
@@ -189,6 +273,7 @@
     .criteria-name {
         font-size: 14px;
         font-weight: 500;
+        position: relative; /* 오류 메시지 위치 지정용 */
     }
 
     .criteria-controls {
@@ -273,6 +358,18 @@
         margin-top: 5px;
         display: block;
         font-weight: 500;
+    }
+
+    .is-invalid {
+        border-color: #E53E3E !important;
+    }
+
+    .criteria-name-input {
+        border: 1px solid #E2E8F0;
+        padding: 6px 10px;
+        border-radius: 4px;
+        width: 200px;
+        background-color: #F9FAFC;
     }
 </style>
 </body>
