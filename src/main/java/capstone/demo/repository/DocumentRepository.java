@@ -17,8 +17,12 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     @Query("SELECT d FROM Document d LEFT JOIN FETCH d.securityElements WHERE d.documentId = :id")
     Document findByIdWithSecurityElements(@Param("id") Long id);
 
-    Document findByDocumentId(Long documentId);
+    @Query("SELECT d FROM Document d WHERE d.level = :level")
+    Page<Document> findBySecurityLevel(@Param("level") Integer level, Pageable pageable);
 
-    // 최근 문서를 createdAt 기준으로 정렬하여 가져오기
-    Page<Document> findAllByOrderByCreatedAtDesc(Pageable pageable);
+    @Query("SELECT d FROM Document d WHERE d.title LIKE %:keyword%")
+    Page<Document> findByTitleContaining(@Param("keyword") String keyword, Pageable pageable);
+
+    Page<Document> findByUserId(Long userId, Pageable pageable);
+
 }
