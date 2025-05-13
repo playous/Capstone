@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>문서 보안 등급 평가 시스템 - 문서 관리</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <!-- 상단 네비게이션 -->
+    <div class="top-nav">
+        <div class="logo">
+            <div class="logo-icon"></div>
+            <div class="logo-text" th:if="${user != null}" th:text="${user.company}">회사명</div>
+        </div>
+        <div class="nav-actions">
+            <div class="user-profile">
+                <div class="avatar"></div>
+                <span th:if="${user != null}" th:text="${user.name}">관리자</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 메인 대시보드 -->
+    <div class="main-container">
+        <!-- 왼쪽 사이드바 -->
+        <div class="sidebar">
+            <div class="sidebar-menu">
+                <a th:href="@{/dashboard}" class="menu-item">
+                    <div class="menu-item-icon">📊</div>
+                    대시보드
+                </a>
+                <a th:href="@{/docs/list}" class="menu-item active">
+                    <div class="menu-item-icon">📄</div>
+                    문서 관리
+                </a>
+                <a th:href="@{/docs/upload}" class="menu-item">
+                    <div class="menu-item-icon">📤</div>
+                    문서 업로드
+                </a>
+                <a th:href="@{/settings}" class="menu-item">
+                    <div class="menu-item-icon">🔧</div>
+                    보안 기준 관리
+                </a>
+            </div>
+        </div>
+        
+        <!-- 메인 콘텐츠 -->
+        <div class="content">
+            <div class="page-title">문서 관리</div>
+            
+            <!-- 알림 메시지 -->
+            <div th:if="${message}" class="alert" th:classappend="${messageType == 'error' ? 'alert-error' : 'alert-success'}">
+                <p th:text="${message}">알림 메시지</p>
+            </div>
+            
+            <div class="documents-list">
+                <div class="list-header">
+                    <div class="section-title">전체 문서</div>
+                    <form th:action="@{/docs/list}" method="get" class="search-box">
+                        <input type="text" name="query" class="search-input" placeholder="문서 검색..." th:value="${param.query}">
+                        <button type="submit" class="search-icon">🔍</button>
+                    </form>
+                </div>
+                
+                <div class="filter-buttons" style="margin-bottom: 15px;">
+                    <a th:href="@{/docs/list}" class="filter-button" th:classappend="${securityLevel == null ? 'active' : ''}">전체</a>
+                    <a th:href="@{/docs/list(level=1)}" class="filter-button" th:classappend="${securityLevel == 1 ? 'active' : ''}">1등급</a>
+                    <a th:href="@{/docs/list(level=2)}" class="filter-button" th:classappend="${securityLevel == 2 ? 'active' : ''}">2등급</a>
+                    <a th:href="@{/docs/list(level=3)}" class="filter-button" th:classappend="${securityLevel == 3 ? 'active' : ''}">3등급</a>
+                    <a th:href="@{/docs/list(level=4)}" class="filter-button" th:classappend="${securityLevel == 4 ? 'active' : ''}">4등급</a>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>문서명</th>
+                            <th>등급</th>
+                            <th>업로드 날짜</th>
+                            <th>상태</th>
+                            <th>작업</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${documents.empty}">
+                            <td colspan="5" class="text-center">문서가 없습니다.</td>
+                        </tr>
+                        <tr th:each="doc : ${documents}">
+                            <td th:text="${doc.title}">문서 제목</td>
+                            <td>
+                                <div th:class="'security-tag security-' + ${doc.level}" th:text="${doc.level}">3</div>
+                            </td>
+                            <td th:text="${#temporals.format(doc.createdAt, 'yyyy-MM-dd')}">2025-04-28</td>
+                            <td>
+                                <span th:class="'status-indicator status-' + ${doc.status.name().toLowerCase()}"></span>
+                                <span th:text="${doc.status.name() == 'COMPLETED' ? '완료' : '처리중'}">완료</span>
+                            </td>
+                            <td>
+                                <a th:href="@{/docs/{id}(id=${doc.documentId})}" class="action-button">보기</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 페이징 -->
+                <div class="pagination" th:if="${documents.totalPages > 1}">
+                    <a th:href="@{/docs/list/{page}(page=${documents.number - 1}, level=${param.level}, query=${param.query})}"
+                       th:class="${documents.first ? 'disabled' : ''}">&lt; 이전</a>
+
+                    <span th:each="i : ${#numbers.sequence(0, documents.totalPages - 1)}">
+                        <a th:href="@{/docs/list/{page}(page=${i}, level=${param.level}, query=${param.query})}"
+                           th:text="${i + 1}"
+                           th:class="${i == documents.number ? 'active' : ''}"></a>
+                    </span>
+
+                    <a th:href="@{/docs/list/{page}(page=${documents.number + 1}, level=${param.level}, query=${param.query})}"
+                       th:class="${documents.last ? 'disabled' : ''}">다음 &gt;</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script th:src="@{/js/documents.js}"></script>
+</body>
+</html>
