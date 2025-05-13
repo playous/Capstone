@@ -9,7 +9,7 @@ import capstone.demo.enums.DocumentStatus;
 import capstone.demo.repository.DocumentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -61,11 +61,18 @@ public class DocumentService {
         return documentRepository.findBySecurityLevel(level);
     }
 
-    public Page<Document> getRecentDocuments() {
-        // 최근 5개의 문서를 가져옵니다.
-        PageRequest pageRequest = PageRequest.of(0, 5);
-        return documentRepository.findAll(pageRequest);
+    public Page<Document> getDocumentsByUser(Long userId, Pageable pageable) {
+        return documentRepository.findByUserId(userId, pageable);
     }
+
+    public Page<Document> getDocumentsBySecurityLevel(Integer level, Pageable pageable) {
+        return documentRepository.findBySecurityLevel(level, pageable);
+    }
+
+    public Page<Document> searchDocumentsByTitle(String keyword, Pageable pageable) {
+        return documentRepository.findByTitleContaining(keyword, pageable);
+    }
+
 
     public Document getDocument(Long id) {
         return documentRepository.findByIdWithSecurityElements(id);
