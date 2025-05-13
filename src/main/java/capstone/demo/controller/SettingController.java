@@ -13,17 +13,22 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
+@RequestMapping("/settings")
 public class SettingController {
 
     private final SettingService settingService;
 
-    @GetMapping("/settings")
+    /**
+     * 커스터마이징 화면
+     */
+    @GetMapping("")
     public String settings(Model model,
                            HttpSession session) {
         User user = (User) session.getAttribute("logInUser");
@@ -34,7 +39,11 @@ public class SettingController {
         return "settings";
     }
 
-    @PostMapping("/settings/save")
+    /**
+     * 커스터마이징 저장
+     */
+
+    @PostMapping("/save")
     public String save(@Valid @ModelAttribute CriteriaListDto criteriaList,
                        BindingResult bindingResult,
                        HttpSession session,
