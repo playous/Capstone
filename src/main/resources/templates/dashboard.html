@@ -30,7 +30,7 @@
                     <div class="menu-item-icon">📊</div>
                     대시보드
                 </a>
-                <a th:href="@{/docs}" class="menu-item">
+                <a th:href="@{/docs/list}" class="menu-item">
                     <div class="menu-item-icon">📄</div>
                     문서 관리
                 </a>
@@ -43,7 +43,18 @@
                     보안 기준 관리
                 </a>
             </div>
+
+            <div class="spacer"></div>
+
+            <div class="logout-container">
+                <a th:href="@{/logout}" class="logout-button">
+                    <div class="logout-text">
+                        로그아웃
+                    </div>
+                </a>
+            </div>
         </div>
+
         
         <!-- 메인 콘텐츠 -->
         <div class="content">
@@ -109,7 +120,7 @@
                                 <span class="security-tag" th:classappend="'security-' + ${doc.level}" th:text="${doc.level}">3</span>
                             </div>
                         </div>
-                        <a th:href="@{/docs/view/{id}(id=${doc.documentId})}" class="document-action">보기</a>
+                        <a th:href="@{/docs/{id}(id=${doc.documentId})}" class="document-action">보기</a>
                     </div>
                 </div>
             </div>
@@ -162,22 +173,6 @@
             left: 0;
             width: 100%;
             height: 4px;
-        }
-        
-        .security-1 {
-            background-color: #10B981;
-        }
-        
-        .security-2 {
-            background-color: #3B82F6;
-        }
-        
-        .security-3 {
-            background-color: #F59E0B;
-        }
-        
-        .security-4 {
-            background-color: #EF4444;
         }
         
         .recent-documents {
