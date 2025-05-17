@@ -47,9 +47,4 @@ public class MainController {
         return "dashboard";
     }
 
-    @GetMapping("/docs/upload")
-    public String showUploadForm() {
-        return "upload";
-    }
-
 }
