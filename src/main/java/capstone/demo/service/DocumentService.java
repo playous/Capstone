@@ -57,20 +57,20 @@ public class DocumentService {
     }
 
 
-    public int getDocumentsBySecurityLevel(int level) {
-        return documentRepository.findBySecurityLevel(level);
+    public int getDocumentsBySecurityLevel(int level,Long userId) {
+        return documentRepository.findBySecurityLevel(level, userId);
     }
 
     public Page<Document> getDocumentsByUser(Long userId, Pageable pageable) {
         return documentRepository.findByUserId(userId, pageable);
     }
 
-    public Page<Document> getDocumentsBySecurityLevel(Integer level, Pageable pageable) {
-        return documentRepository.findBySecurityLevel(level, pageable);
+    public Page<Document> getDocumentsBySecurityLevel(Integer level, Long userId, Pageable pageable) {
+        return documentRepository.findBySecurityLevel(level, userId, pageable);
     }
 
-    public Page<Document> searchDocumentsByTitle(String keyword, Pageable pageable) {
-        return documentRepository.findByTitleContaining(keyword, pageable);
+    public Page<Document> searchDocumentsByTitle(String keyword, Long userId, Pageable pageable) {
+        return documentRepository.findByTitleContaining(keyword, userId, pageable);
     }
 
 
