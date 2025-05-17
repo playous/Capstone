@@ -50,10 +50,10 @@ public class DocumentController {
         Long userId = user.getId();
 
         if (level != null) {
-            documents = documentService.getDocumentsBySecurityLevel(level, pageable);
+            documents = documentService.getDocumentsBySecurityLevel(level,userId, pageable);
             model.addAttribute("securityLevel", level);
         } else if (query != null && !query.trim().isEmpty()) {
-            documents = documentService.searchDocumentsByTitle(query, pageable);
+            documents = documentService.searchDocumentsByTitle(query, userId, pageable);
         } else {
             documents = documentService.getDocumentsByUser(userId, pageable);
         }

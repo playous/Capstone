@@ -11,17 +11,17 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DocumentRepository extends JpaRepository<Document, Long> {
 
-    @Query("SELECT COUNT(d) FROM Document d Where d.level = :level")
-    int findBySecurityLevel(@Param("level") Integer level);
+    @Query("SELECT COUNT(d) FROM Document d Where d.level = :level and d.user.id = :userId")
+    int findBySecurityLevel(@Param("level") Integer level, @Param("userId") Long userId);
 
     @Query("SELECT d FROM Document d LEFT JOIN FETCH d.securityElements WHERE d.documentId = :id")
     Document findByIdWithSecurityElements(@Param("id") Long id);
 
-    @Query("SELECT d FROM Document d WHERE d.level = :level")
-    Page<Document> findBySecurityLevel(@Param("level") Integer level, Pageable pageable);
+    @Query("SELECT d FROM Document d WHERE d.level = :level AND d.user.id = :userId")
+    Page<Document> findBySecurityLevel(@Param("level") Integer level, @Param("userId") Long userId, Pageable pageable);
 
-    @Query("SELECT d FROM Document d WHERE d.title LIKE %:keyword%")
-    Page<Document> findByTitleContaining(@Param("keyword") String keyword, Pageable pageable);
+    @Query("SELECT d FROM Document d WHERE d.title LIKE %:keyword% AND d.user.id = :userId")
+    Page<Document> findByTitleContaining(@Param("keyword") String keyword,@Param("userId") Long userId, Pageable pageable);
 
     Page<Document> findByUserId(Long userId, Pageable pageable);
 

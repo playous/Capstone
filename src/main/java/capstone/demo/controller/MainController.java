@@ -30,13 +30,13 @@ public class MainController {
         public String dashboard(Model model,
                                 HttpSession session){
 
-        int[] securityLevelCounts = new int[4];
-        for (int i = 1; i <= 4; i++) {
-            securityLevelCounts[i-1] = documentService.getDocumentsBySecurityLevel(i);
-        }
-
         User user = (User)session.getAttribute("logInUser");
         Long userId = user.getId();
+
+        int[] securityLevelCounts = new int[4];
+        for (int i = 1; i <= 4; i++) {
+            securityLevelCounts[i-1] = documentService.getDocumentsBySecurityLevel(i,userId);
+        }
 
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Document> recentDocuments = documentService.getDocumentsByUser(userId, pageable);
