@@ -10,7 +10,7 @@
     <!-- 상단 네비게이션 -->
     <div class="top-nav">
         <div class="logo">
-            <div class="logo-icon"></div>
+            <div class="logo-icon">S</div>
             <div class="logo-text" th:text="${user.company}">회사명</div>
         </div>
         <div class="nav-actions">
@@ -67,7 +67,7 @@
             
             <div class="welcome-banner">
                 <div class="welcome-title" th:text="'안녕하세요, ' + ${user != null ? user.name : '사용자'} + '님!'">안녕하세요!</div>
-                <div class="welcome-text">문서 보안 등급 평가 시스템에 오신 것을 환영합니다. 이 시스템을 통해 문서의 보안 등급을 자동으로 분류하고 관리할 수 있습니다.</div>
+                <div class="welcome-text"> 이 시스템을 통해 문서의 보안 등급을 자동으로 분류하고 관리할 수 있습니다.</div>
             </div>
             
             <!-- 보안 등급 통계 -->
@@ -101,7 +101,7 @@
             <div class="recent-documents">
                 <div class="section-header">
                     <div class="section-title">최근 분석된 문서</div>
-                    <a th:href="@{/docs}" class="view-all-link">전체 보기</a>
+                    <a th:href="@{/docs/list}" class="view-all-link">전체 보기</a>
                 </div>
                 
                 <div th:if="${recentDocuments.empty}" class="empty-state">
@@ -112,12 +112,11 @@
                 
                 <div th:if="${!recentDocuments.empty}" class="document-list">
                     <div th:each="doc : ${recentDocuments}" class="document-item">
-                        <div class="document-icon">📄</div>
+                        <span class="security-tag" th:classappend="'security-' + ${doc.level}" th:text="${doc.level}">3</span>
                         <div class="document-info">
                             <div class="document-title" th:text="${doc.title}">문서 제목</div>
                             <div class="document-meta">
                                 <span th:text="${#temporals.format(doc.createdAt, 'yyyy-MM-dd')}">2025-04-28</span>
-                                <span class="security-tag" th:classappend="'security-' + ${doc.level}" th:text="${doc.level}">3</span>
                             </div>
                         </div>
                         <a th:href="@{/docs/{id}(id=${doc.documentId})}" class="document-action">보기</a>
@@ -187,6 +186,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            padding-top: 10px;
         }
         
         .view-all-link {
