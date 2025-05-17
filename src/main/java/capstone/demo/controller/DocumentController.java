@@ -2,11 +2,13 @@ package capstone.demo.controller;
 
 import capstone.demo.domain.Document;
 import capstone.demo.domain.User;
+import capstone.demo.dto.DocumentViewDto;
 import capstone.demo.dto.ResultListDto;
 import capstone.demo.service.DocumentService;
 import capstone.demo.service.S3Service;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,11 +19,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.nio.charset.StandardCharsets;
 
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/docs")
+@Slf4j
 public class DocumentController {
 
     private final DocumentService documentService;
@@ -63,28 +65,13 @@ public class DocumentController {
                              HttpSession httpSession) {
 
         try {
-            if (file.isEmpty()) {
-                redirectAttributes.addFlashAttribute("message", "파일을 선택해주세요.");
-                redirectAttributes.addFlashAttribute("messageType", "error");
-                return "upload";
-            }
-
-            String contentType = file.getContentType();
-            if (!contentType.equals("text/plain") &&
-                    !contentType.equals("application/pdf") &&
-                    !contentType.equals("image/jpeg")) {
-                redirectAttributes.addFlashAttribute("message", "지원하지 않는 파일 형식입니다.");
-                redirectAttributes.addFlashAttribute("messageType", "error");
-                return "upload";
-            }
-
             User user = (User) httpSession.getAttribute("logInUser");
 
             Document document = documentService.uploadDocument(file,user,title);
 
             redirectAttributes.addFlashAttribute("message", "문서가 성공적으로 업로드되었습니다.");
             redirectAttributes.addFlashAttribute("messageType", "success");
-            return "redirect:/docs/" + document.getDocumentId() + "/analysis";
+            return "redirect:/analysis/" + document.getDocumentId();
 
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("message", "오류 발생: " + e.getMessage());
@@ -98,14 +85,13 @@ public class DocumentController {
                                Model model) {
         Document document = documentService.getDocument(id);
         ResultListDto resultListDto = documentService.documentToDto(document);
-        byte[] rawFileContent = s3Service.getFileContent(document.getS3Key());
 
-        // byte[]를 String으로 변환
-        String fileContent = new String(rawFileContent, StandardCharsets.UTF_8);
+        String s3Url = s3Service.generatePresignedUrl(document.getS3Key(), 3600000); // 1시간 유효
 
-        model.addAttribute("resultList", resultListDto);
-        model.addAttribute("fileContent", fileContent);
+        DocumentViewDto documentViewDto = new DocumentViewDto(document,resultListDto,s3Url,document.getContentType());
 
+        log.info("documentViewDto = {}",documentViewDto);
+        model.addAttribute("documentView", documentViewDto);
         return "document-view";
     }
 
