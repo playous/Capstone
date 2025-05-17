@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>문서 보안 등급 평가 시스템 - 문서 보기</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        /* 기존 스타일 유지 */
+        .document-container {
+            display: flex;
+            width: 100%;
+            height: calc(100vh - 120px);
+        }
+
+        .document-viewer {
+            flex: 1;
+            padding: 0 20px;
+            background-color: #f8f9fc;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .document-content {
+            flex: 1;
+            background-color: white;
+            border-radius: 8px;
+            padding: 0 30px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            overflow-y: auto;
+        }
+
+        /* iframe과 이미지가 컨테이너를 꽉 채우도록 수정 */
+        .document-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            min-height: 500px; /* 최소 높이 설정 */
+            display: block;
+        }
+
+        .document-content {
+            flex: 1;
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 60px); /* 패딩을 고려한 높이 계산 */
+        }
+
+        /* PDF와 텍스트 파일을 표시하는 컨테이너를 flex로 설정하여 꽉 채우게 함 */
+        .document-iframe-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+        }
+
+        .document-img {
+            max-width: 100%;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .fallback-container {
+            text-align: center;
+            padding: 30px;
+            padding-top: 300px;
+        }
+
+        .fallback-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .fallback-message {
+            margin-bottom: 20px;
+            color: #5f6368;
+        }
+
+        .view-document-button {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #4285f4;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .view-document-button:hover {
+            background-color: #2b76f5;
+        }
+
+        /* 분석 결과 패널 스타일 - 개선된 디자인 */
+        .analysis-panel {
+            width: 320px;
+            background-color: white;
+            border-left: 1px solid #e0e0e0;
+            overflow-y: auto;
+            flex-shrink: 0;
+            border-radius: 8px;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.03);
+        }
+
+        .analysis-header {
+            padding: 20px;
+            background-color: white; /* 그라데이션 제거하고 밝은 회색 배경으로 변경 */
+            color: #202124; /* 텍스트 색상을 검정색으로 변경 */
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .header-icon {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .analysis-content {
+            padding: 24px;
+        }
+
+        /* 보안 등급 스타일 */
+        .security-overview {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .security-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            font-weight: 700;
+            color: white;
+            margin: 0 auto 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .security-circle:hover {
+            transform: scale(1.05);
+        }
+
+        .security-1 {
+            background-color: #34a853; /* 낮음 - 초록 */
+        }
+
+        .security-2 {
+            background-color: #4285f4; /* 중간 - 파랑 */
+        }
+
+        .security-3 {
+            background-color: #fbbc05; /* 높음 - 노랑 */
+        }
+
+        .security-4 {
+            background-color: #ea4335; /* 매우 높음 - 빨강 */
+        }
+
+        .security-title {
+            text-align: center;
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #202124;
+        }
+
+        .security-desc {
+            text-align: center;
+            font-size: 14px;
+            color: #5f6368;
+            margin-bottom: 25px;
+        }
+
+        /* 보안 진행바 */
+        .security-progress-container {
+            margin: 25px 0;
+            position: relative;
+        }
+
+        .security-progress-bar-bg {
+            height: 8px;
+            background-color: #f1f3f4;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .security-progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .progress-level-1 {
+            width: 25%;
+            background-color: #34a853;
+        }
+
+        .progress-level-2 {
+            width: 50%;
+            background-color: #4285f4;
+        }
+
+        .progress-level-3 {
+            width: 75%;
+            background-color: #fbbc05;
+        }
+
+        .progress-level-4 {
+            width: 100%;
+            background-color: #ea4335;
+        }
+
+        .security-progress-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #5f6368;
+        }
+
+        /* 구분선 */
+        .divider {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 25px -24px;
+            position: relative;
+            left: 0;
+            width: calc(100% + 48px);
+        }
+
+        /* 발견된 민감 정보 섹션 */
+        .findings-section {
+            margin-top: 25px;
+        }
+
+        .findings-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #202124;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-icon {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+
+        /* 발견된 항목 스타일 */
+        .finding-items {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .finding-item {
+            background-color: #f8f9fc;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .finding-item:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .finding-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .finding-badge {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 10px;
+            font-size: 13px;
+        }
+
+        .finding-name {
+            font-weight: 500;
+            font-size: 15px;
+            color: #202124;
+        }
+
+        .finding-desc {
+            margin-left: 36px;
+            font-size: 14px;
+            color: #5f6368;
+            line-height: 1.5;
+        }
+
+        .no-findings {
+            text-align: center;
+            padding: 20px;
+            font-size: 14px;
+            color: #5f6368;
+            background-color: #f8f9fc;
+            border-radius: 8px;
+        }
+
+        /* 애니메이션 추가 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .finding-item {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        .finding-item:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .finding-item:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+    </style>
+</head>
+<body>
+<!-- 상단 네비게이션 -->
+<div class="top-nav">
+    <div class="logo">
+        <div class="logo-icon">S</div>
+        <div class="logo-text" th:if="${user != null}" th:text="${user.company}">회사명</div>
+    </div>
+    <div class="nav-actions">
+        <div class="user-profile">
+            <div class="avatar"></div>
+            <span th:if="${user != null}" th:text="${user.name}">관리자</span>
+        </div>
+    </div>
+</div>
+
+<!-- 메인 대시보드 -->
+<div class="main-container">
+    <!-- 왼쪽 사이드바 -->
+    <div class="sidebar">
+        <div class="sidebar-menu">
+            <a th:href="@{/dashboard}" class="menu-item">
+                <div class="menu-item-icon">📊</div>
+                대시보드
+            </a>
+            <a th:href="@{/docs/list}" class="menu-item active">
+                <div class="menu-item-icon">📄</div>
+                문서 관리
+            </a>
+            <a th:href="@{/docs/upload}" class="menu-item">
+                <div class="menu-item-icon">📤</div>
+                문서 업로드
+            </a>
+            <a th:href="@{/settings}" class="menu-item">
+                <div class="menu-item-icon">🔧</div>
+                보안 기준 관리
+            </a>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="page-header">
+            <div class="page-title" th:text="${documentView.documentName}">문서 제목</div>
+        </div>
+
+        <div class="document-container">
+            <!-- 가운데: 문서 뷰어 영역 -->
+            <div class="document-viewer">
+                <div class="document-content">
+                    <!-- PDF 문서 표시 -->
+                    <div th:if="${documentView.documentUrl != null && documentView.contentType != null && documentView.contentType.contains('pdf')}" class="document-iframe-container">
+                        <iframe class="document-iframe" th:src="${documentView.documentUrl}"></iframe>
+                    </div>
+
+                    <!-- 이미지 표시 -->
+                    <div th:if="${documentView.documentUrl != null && documentView.contentType != null && (
+                documentView.contentType.contains('image/jpeg') ||
+                documentView.contentType.contains('image/png') ||
+                documentView.contentType.contains('image/gif'))}">
+                        <img class="document-img" th:src="${documentView.documentUrl}" alt="문서 이미지"/>
+                    </div>
+
+                    <!-- 텍스트 문서 표시 -->
+                    <div th:if="${documentView.documentUrl != null && documentView.contentType != null && (
+                documentView.contentType.contains('text/plain') ||
+                documentView.contentType.contains('text/csv') ||
+                documentView.contentType.contains('text/html') ||
+                documentView.contentType.contains('text/xml'))}" class="document-iframe-container">
+                        <iframe class="document-iframe" th:src="${documentView.documentUrl}"></iframe>
+                    </div>
+
+                    <!-- HWP 파일 처리 -->
+                    <div th:if="${documentView.documentUrl != null && documentView.contentType != null && (
+                documentView.contentType.contains('application/x-hwp') ||
+                documentView.contentType.contains('application/haansofthwp'))}">
+                        <div class="fallback-container">
+                            <div class="fallback-icon">📝</div>
+                            <p class="fallback-message">HWP 파일은 미리보기를 지원하지 않습니다.</p>
+                            <a th:href="${documentView.documentUrl}" class="view-document-button" download>HWP 파일 다운로드</a>
+                        </div>
+                    </div>
+
+                    <!-- Word 문서 처리 -->
+                    <div th:if="${documentView.documentUrl != null && documentView.contentType != null && (
+                documentView.contentType.contains('application/msword') ||
+                documentView.contentType.contains('application/vnd.openxmlformats-officedocument.wordprocessingml.document'))}">
+                        <div class="fallback-container">
+                            <div class="fallback-icon">📝</div>
+                            <p class="fallback-message">Word 문서는 미리보기를 지원하지 않습니다.</p>
+                            <a th:href="${documentView.documentUrl}" class="view-document-button" download>Word 파일 다운로드</a>
+                        </div>
+                    </div>
+
+                    <!-- URL이 없는 경우 -->
+                    <p th:unless="${documentView.documentUrl != null}" class="text-center">문서 내용을 표시할 수 없습니다.</p>
+                </div>
+            </div>
+
+            <!-- 오른쪽: 분석 결과 패널 -->
+            <div class="analysis-panel">
+                <div class="analysis-header">
+                    <span class="header-icon">📊</span>
+                    <span>문서 분석 결과</span>
+                </div>
+
+                <div class="analysis-content">
+                    <!-- 보안 등급 정보 -->
+                    <div class="security-circle" th:classappend="'security-' + ${documentView.resultList.documentSecurityLevel}">
+                        <span th:text="${documentView.resultList.documentSecurityLevel}">1</span>
+                    </div>
+
+                    <div class="security-title">종합 보안 등급</div>
+                    <div class="security-desc" th:if="${documentView.resultList.documentSecurityLevel == 1}">(낮음 - 일반 정보)</div>
+                    <div class="security-desc" th:if="${documentView.resultList.documentSecurityLevel == 2}">(중간 - 내부 정보)</div>
+                    <div class="security-desc" th:if="${documentView.resultList.documentSecurityLevel == 3}">(높음 - 민감 정보)</div>
+                    <div class="security-desc" th:if="${documentView.resultList.documentSecurityLevel == 4}">(매우 높음 - 기밀 정보)</div>
+
+                    <!-- 보안 진행바 -->
+                    <div class="security-progress-container">
+                        <div class="security-progress-bar-bg">
+                            <div class="security-progress-bar"
+                                 th:classappend="'progress-level-' + ${documentView.resultList.documentSecurityLevel}"></div>
+                        </div>
+                        <div class="security-progress-labels">
+                            <span>낮음</span>
+                            <span></span>
+                            <span></span>
+                            <span>매우 높음</span>
+                        </div>
+                    </div>
+
+                    <!-- 구분선 -->
+                    <div class="divider"></div>
+
+                    <!-- 발견된 민감 정보 섹션 -->
+                    <div class="findings-section">
+                        <div class="findings-title">
+                            <span class="section-icon">🔍</span>
+                            발견된 민감 정보
+                        </div>
+
+                        <div class="finding-items">
+                            <div class="no-findings" th:if="${documentView.resultList.resultList == null || documentView.resultList.resultList.isEmpty()}">
+                                민감 정보가 발견되지 않았습니다.
+                            </div>
+
+                            <div class="finding-item" th:each="result : ${documentView.resultList.resultList}">
+                                <div class="finding-header">
+                                    <div class="finding-badge" th:classappend="'security-' + ${result.level}"
+                                         th:text="${result.level}">1</div>
+                                    <div class="finding-name" th:text="${result.name}">개인정보</div>
+                                </div>
+                                <div class="finding-desc" th:text="${result.description}">
+                                    이름, 연락처, 주민번호가 포함되어 있습니다.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // URL에서 파일 확장자를 추출하는 함수
+    function getFileExtension(url) {
+        // URL에서 ?나 # 이전의 부분만 추출
+        url = url.split('?')[0].split('#')[0];
+        // 마지막 슬래시 이후의 부분 추출
+        const filename = url.split('/').pop();
+        // 파일명에서 마지막 점 이후의 부분 추출
+        return filename.split('.').pop().toLowerCase();
+    }
+</script>
+</body>
+</html>
