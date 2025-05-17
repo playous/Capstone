@@ -10,7 +10,7 @@
 <!-- 상단 네비게이션 -->
 <div class="top-nav">
     <div class="logo">
-        <div class="logo-icon"></div>
+        <div class="logo-icon">S</div>
         <div class="logo-text" th:text="${user.company}">회사명</div>
     </div>
     <div class="nav-actions">
@@ -30,7 +30,7 @@
                 <div class="menu-item-icon">📊</div>
                 대시보드
             </a>
-            <a th:href="@{/docs}" class="menu-item">
+            <a th:href="@{/docs/list}" class="menu-item">
                 <div class="menu-item-icon">📄</div>
                 문서 관리
             </a>
