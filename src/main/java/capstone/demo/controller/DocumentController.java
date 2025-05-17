@@ -29,6 +29,11 @@ public class DocumentController {
     private final DocumentService documentService;
     private final S3Service s3Service;
 
+    @GetMapping("/upload")
+    public String showUploadForm() {
+        return "upload";
+    }
+
     @GetMapping({"/list","/list/{page}"})
     public String documents(@PathVariable(required = false) Integer page,
                             @RequestParam(required = false) Integer level,
