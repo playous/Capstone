@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>문서 보안 등급 평가 시스템 - 문서 업로드</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<!-- 상단 네비게이션 -->
+<div class="top-nav">
+    <div class="logo">
+        <div class="logo-icon">S</div>
+        <div class="logo-text" th:text="${user.company}">회사명</div>
+    </div>
+    <div class="nav-actions">
+        <div class="user-profile">
+            <div class="avatar"></div>
+            <span th:text="${user.name}">관리자</span>
+        </div>
+    </div>
+</div>
+
+<!-- 메인 대시보드 -->
+<div class="main-container">
+    <!-- 왼쪽 사이드바 -->
+    <div class="sidebar">
+        <div class="sidebar-menu">
+            <a th:href="@{/dashboard}" class="menu-item">
+                <div class="menu-item-icon">📊</div>
+                대시보드
+            </a>
+            <a th:href="@{/docs/list}" class="menu-item">
+                <div class="menu-item-icon">📄</div>
+                문서 관리
+            </a>
+            <a th:href="@{/docs/upload}" class="menu-item active">
+                <div class="menu-item-icon">📤</div>
+                문서 업로드
+            </a>
+            <a th:href="@{/settings}" class="menu-item">
+                <div class="menu-item-icon">🔧</div>
+                보안 기준 관리
+            </a>
+        </div>
+    </div>
+
+    <!-- 메인 콘텐츠 -->
+    <div class="content">
+        <div class="page-title">문서 업로드</div>
+
+        <!-- 알림 메시지 -->
+        <div th:if="${message}" class="alert" th:classappend="${messageType == 'error' ? 'alert-error' : 'alert-success'}">
+            <p th:text="${message}">알림 메시지</p>
+        </div>
+
+        <form th:action="@{/docs/upload}" method="post" enctype="multipart/form-data" id="uploadForm" novalidate>
+            <div class="upload-area">
+                <div class="section-title">파일 선택</div>
+
+                <div class="dropzone" id="dropzone">
+                    <div class="dropzone-icon">📄</div>
+                    <div class="dropzone-text">파일을 끌어서 놓거나 클릭하여 선택하세요</div>
+                    <div class="browse-button">파일 찾기</div>
+                    <input type="file" name="file" class="file-input" id="fileInput">
+                    <div style="margin-top: 10px; font-size: 12px; color: #718096;">* 지원 파일 형식: txt, pdf, jpg, jepg, png, hwp, word(doc, docx)</div>
+                </div>
+            </div>
+
+            <div class="upload-area">
+                <div class="section-title">문서 정보</div>
+
+                <div class="form-group">
+                    <label class="form-label">문서 제목</label>
+                    <input type="text" name="title" class="form-input" placeholder="문서 제목을 입력하세요">
+                </div>
+
+                <button type="submit" class="login-button" id="uploadButton">업로드 및 분석</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 분석 진행 중 화면 -->
+<div class="analysis-screen hidden" id="analysisScreen">
+    <div class="progress-circle" style="--progress: 0%">
+        <div class="progress-percentage">0%</div>
+    </div>
+    <div class="analysis-title">문서 분석 중...</div>
+    <div class="analysis-description">
+        문서에서 민감한 정보를 분석하고 보안 등급을 평가하고 있습니다. 이 과정은 몇 분 정도 소요될 수 있습니다.
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadForm = document.getElementById('uploadForm');
+        const mainContainer = document.querySelector('.main-container');
+        const analysisScreen = document.getElementById('analysisScreen');
+
+        // 지원하는 파일 형식 목록
+        const supportedFileTypes = [
+            'text/plain',          // txt
+            'application/pdf',     // pdf
+            'image/jpeg',          // jpg, jpeg
+            'image/jpg',
+            'image/png',           // png
+            'application/msword',  // doc
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // docx
+            'application/x-hwp',   // hwp
+            'application/haansofthwp'  // hwp
+        ];
+
+        // 드롭존 클릭 시 파일 선택 다이얼로그 표시
+        dropzone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // 파일 선택 시 UI 업데이트
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                const fileName = e.target.files[0].name;
+                dropzone.querySelector('.dropzone-text').textContent = '선택된 파일: ' + fileName;
+            }
+        });
+
+        // 폼 제출 시 처리
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // 폼 제출 방지
+
+            // 파일 유효성 검사
+            if (!fileInput.files || fileInput.files.length === 0) {
+                // 동일한 오류 메시지 형식으로 표시
+                showErrorMessage("파일을 선택해주세요.");
+                return false;
+            }
+
+            // 제목 유효성 검사
+            const title = uploadForm.querySelector('input[name="title"]').value;
+            if (!title || title.trim() === '') {
+                // 동일한 오류 메시지 형식으로 표시
+                showErrorMessage("문서 제목을 입력해주세요.");
+                return false;
+            }
+
+            // 파일 형식 검사 (클라이언트 측에서 미리 검사)
+            const file = fileInput.files[0];
+            if (file && !supportedFileTypes.includes(file.type)) {
+                // 동일한 오류 메시지 형식으로 표시
+                showErrorMessage("지원하지 않는 파일 형식입니다.");
+                return false;
+            }
+
+            // 폼이 유효하면 여기서 원형 진행 애니메이션 표시
+            mainContainer.classList.add('hidden');
+            analysisScreen.classList.remove('hidden');
+
+            // 진행 애니메이션 시작
+            let progress = 0;
+            const progressCircle = document.querySelector('.progress-circle');
+            const progressPercentage = document.querySelector('.progress-percentage');
+
+            const interval = setInterval(() => {
+                progress += 5;
+                progressCircle.style.setProperty('--progress', progress + '%');
+                progressPercentage.textContent = progress + '%';
+
+                // 100%에 도달하면 폼 제출
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    uploadForm.submit(); // 실제 폼 제출
+                }
+            }, 200);
+        });
+
+        // 오류 메시지 표시 함수 - 통일된 형식의 오류 메시지를 표시
+        function showErrorMessage(message) {
+            // 기존 알림 메시지가 있으면 제거
+            const existingAlert = document.querySelector('.alert');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+
+            // 새 알림 메시지 생성 (스타일링과 위치는 기존 알림과 동일하게)
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-error';
+            alertDiv.style.backgroundColor = '#FEE2E2'; // 연한 빨간색 배경
+            alertDiv.style.color = '#B91C1C';           // 진한 빨간색 글자
+            alertDiv.style.padding = '12px';
+            alertDiv.style.borderRadius = '6px';
+            alertDiv.style.marginBottom = '20px';
+
+            const alertParagraph = document.createElement('p');
+            alertParagraph.textContent = message;
+            alertDiv.appendChild(alertParagraph);
+
+            // 알림 메시지를 페이지 제목 바로 아래에 삽입
+            const pageTitle = document.querySelector('.page-title');
+            pageTitle.insertAdjacentElement('afterend', alertDiv);
+        }
+
+        // 드래그 앤 드롭 기능
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('dragover');
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+
+            if (e.dataTransfer.files.length > 0) {
+                fileInput.files = e.dataTransfer.files;
+                const fileName = e.dataTransfer.files[0].name;
+                dropzone.querySelector('.dropzone-text').textContent = '선택된 파일: ' + fileName;
+            }
+        });
+    });
+</script>
+<style>
+    .analysis-screen {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: white;
+    }
+
+    .progress-circle {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: conic-gradient(#8A4FFF var(--progress, 0%), #E2E8F0 0%);
+        margin-bottom: 30px;
+        position: relative;
+    }
+
+    .progress-circle::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100px;
+        height: 100px;
+        background-color: white;
+        border-radius: 50%;
+    }
+
+    .progress-percentage {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 24px;
+        font-weight: 600;
+        color: #1A202C;
+    }
+
+    .analysis-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    .analysis-description {
+        font-size: 14px;
+        color: #718096;
+        text-align: center;
+        max-width: 400px;
+        margin-bottom: 30px;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    /* 드롭존 스타일 */
+    .dropzone {
+        border: 2px dashed #E2E8F0;
+        border-radius: 6px;
+        padding: 90px;
+        text-align: center;
+        cursor: pointer;
+        min-height: 200px; /* 최소 높이 지정 */
+        flex : 1;
+        display : flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .dropzone.dragover {
+        background-color: #F0E7FF;
+        border-color: #8A4FFF;
+    }
+
+    .dropzone-icon {
+        font-size: 60px;
+        color: #8A4FFF;
+        margin-bottom: 20px;
+    }
+
+    .dropzone-text {
+        font-size: 16px;
+        color: #718096;
+        margin-bottom: 15px;
+    }
+
+    .browse-button {
+        display: inline-block;
+        color: #8A4FFF;
+        text-decoration: underline;
+        cursor: pointer;
+        font-size: 16px; /* 크기 증가 */
+        margin-bottom: 15px; /* 여백 추가 */
+    }
+
+    .file-input {
+        display: none;
+    }
+
+    /* 업로드 영역 스타일 */
+    .upload-area {
+        background-color: white;
+        border-radius: 8px;
+        padding: 25px 35px 35px 35px;
+        margin-bottom: 35px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        flex: 1; /* 가능한 공간 채우기 */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group {
+        margin-bottom: 30px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #4A5568;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #E2E8F0;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    .login-button {
+        width: 100%;
+        padding: 12px;
+        background-color: #8A4FFF;
+        border: none;
+        border-radius: 6px;
+        color: white;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .login-button:hover {
+        background-color: #7442DF;
+    }
+</style>
+</body>
+</html>
