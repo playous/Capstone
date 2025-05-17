@@ -29,7 +29,7 @@ public class DocumentService {
     @Transactional
     public Document uploadDocument(MultipartFile file, User user, String title) throws IOException {
         // S3에 파일 업로드
-        String s3Key = s3Service.uploadFile(file);
+        String s3Key = s3Service.uploadFile(file,user);
 
         // Document 객체 생성 및 저장
         Document document = new Document();
