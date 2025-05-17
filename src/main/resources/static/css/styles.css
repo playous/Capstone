@@ -41,6 +41,12 @@ body {
     background: linear-gradient(135deg, #8A4FFF 20%, #5E35B1 70%);
     border-radius: 6px;
     margin-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
 }
 
 .logo-text {
