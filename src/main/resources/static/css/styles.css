@@ -112,7 +112,6 @@ body {
     justify-content: center;
 }
 
-/* 메인 콘텐츠 */
 .content {
     flex: 1;
     padding: 20px;
@@ -126,7 +125,7 @@ body {
 }
 
 .welcome-banner {
-    background: linear-gradient(135deg, #8A4FFF 20%, #5E35B1 70%);
+    background: linear-gradient(135deg, #8A4FFF 20%, #A67BFF 70%);
     padding: 30px;
     border-radius: 8px;
     margin-bottom: 30px;
@@ -151,12 +150,6 @@ body {
     padding: 30px;
     margin-bottom: 30px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-}
-
-.section-title {
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 15px;
 }
 
 .dropzone {
@@ -258,19 +251,21 @@ body {
 
 .filter-button {
     padding: 8px 14px;
-    border-radius: 6px;
+    border-radius: 20px;
     font-size: 13px;
-    border: 1px solid #E5E9F2;
-    background-color: white;
+    border: none; /* 테두리 제거 */
+    background-color: #EAEDF0; /* 회색 배경 */
     cursor: pointer;
     text-decoration: none;
     color: #4A5568;
+    transition: all 0.2s ease;
+    font-weight: 500;
 }
 
 .filter-button.active {
-    background-color: #F0E7FF;
-    color: #8A4FFF;
-    border-color: #8A4FFF;
+    background-color: #4B57EF;
+    color: white;
+    border-color: #4B57EF;
 }
 
 .search-box {
@@ -282,6 +277,7 @@ body {
     border-radius: 6px;
     border: 1px solid #E5E9F2;
     font-size: 13px;
+    background-color: #F8F9FC;
     width: 250px;
 }
 
@@ -334,6 +330,7 @@ tr:hover {
     font-weight: 600;
     font-size: 12px;
     color: white;
+    margin-right: 15px;
 }
 
 .security-1 {
@@ -371,17 +368,18 @@ tr:hover {
 .action-button {
     padding: 6px 12px;
     border-radius: 4px;
-    font-size: 12px;
-    background-color: #F0E7FF;
-    color: #8A4FFF;
+    font-size: 14px;
+    background-color: #f1f3f4;
+    color: #5f6368;
     border: none;
     cursor: pointer;
     text-decoration: none;
     display: inline-block;
+    font-weight: 500;
 }
 
 .action-button:hover {
-    background-color: #E2D3FF;
+    background-color: #e8eaed;
 }
 
 /* 분석 진행 중 화면 */
@@ -486,14 +484,6 @@ tr:hover {
     background-color: #F0F4F8;
 }
 
-.document-content {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
-    background-color: #F5F7FA;
-    display: flex;
-    justify-content: center;
-}
 
 .document-page {
     background-color: white;
@@ -579,7 +569,13 @@ tr:hover {
     font-size: 14px;
     font-weight: 600;
     margin-bottom: 15px;
-    color: #1A202C;
+    color: #1a202c;
+}
+
+.section-title-list {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a202c;
 }
 
 .section-item {
@@ -752,7 +748,8 @@ tr:hover {
 .logout-button {
     display: block;
     width: 75%; /* 사이드바 폭의 75% */
-    background-color: #f0e6ff; /* 연한 보라색 */
+    background-color: #ffe6e6;  /* 연한 보라색 */
+    color: #c53030;
     border-radius: 10px;
     padding: 8px 15px;
     text-align: center;
@@ -762,7 +759,7 @@ tr:hover {
 }
 
 .logout-button:hover {
-    background-color: #e6d9ff;
+    background-color: #ffd6d6;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -776,4 +773,19 @@ tr:hover {
 .spacer {
     flex-grow: 1; /* 이 요소가 가능한 모든 공간을 차지하도록 설정 */
     min-height: 20px; /* 최소한의 높이 */
+}
+
+.delete-button {
+    background-color: #fce8e6;
+    color: #ea4335;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.delete-button:hover {
+    background-color: #fad2cf;
 }
