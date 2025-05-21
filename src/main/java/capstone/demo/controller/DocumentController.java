@@ -91,7 +91,7 @@ public class DocumentController {
         Document document = documentService.getDocument(id);
         ResultListDto resultListDto = documentService.documentToDto(document);
 
-        String s3Url = s3Service.generatePresignedUrl(document.getS3Key(), 3600000); // 1시간 유효
+        String s3Url = s3Service.generatePresignedUrl(document.getS3Key(), 30); // 30분 유효
 
         DocumentViewDto documentViewDto = new DocumentViewDto(document,resultListDto,s3Url,document.getContentType());
 
