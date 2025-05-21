@@ -30,6 +30,11 @@ cloud:
     stack:
       auto: false
 
+api:
+  ai:
+    serviceUrl: ${AI_SERVICE_URL}
+    endPoint: ${AI_ENDPOINT}
+
 app:
   aws:
     s3:
