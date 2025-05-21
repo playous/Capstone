@@ -81,24 +81,11 @@
     </div>
 </div>
 
-<!-- 분석 진행 중 화면 -->
-<div class="analysis-screen hidden" id="analysisScreen">
-    <div class="progress-circle" style="--progress: 0%">
-        <div class="progress-percentage">0%</div>
-    </div>
-    <div class="analysis-title">문서 분석 중...</div>
-    <div class="analysis-description">
-        문서에서 민감한 정보를 분석하고 보안 등급을 평가하고 있습니다. 이 과정은 몇 분 정도 소요될 수 있습니다.
-    </div>
-</div>
-
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const dropzone = document.getElementById('dropzone');
         const fileInput = document.getElementById('fileInput');
         const uploadForm = document.getElementById('uploadForm');
-        const mainContainer = document.querySelector('.main-container');
-        const analysisScreen = document.getElementById('analysisScreen');
 
         // 지원하는 파일 형식 목록
         const supportedFileTypes = [
@@ -128,7 +115,6 @@
 
         // 폼 제출 시 처리
         uploadForm.addEventListener('submit', function(e) {
-            e.preventDefault(); // 폼 제출 방지
 
             // 파일 유효성 검사
             if (!fileInput.files || fileInput.files.length === 0) {
@@ -152,27 +138,6 @@
                 showErrorMessage("지원하지 않는 파일 형식입니다.");
                 return false;
             }
-
-            // 폼이 유효하면 여기서 원형 진행 애니메이션 표시
-            mainContainer.classList.add('hidden');
-            analysisScreen.classList.remove('hidden');
-
-            // 진행 애니메이션 시작
-            let progress = 0;
-            const progressCircle = document.querySelector('.progress-circle');
-            const progressPercentage = document.querySelector('.progress-percentage');
-
-            const interval = setInterval(() => {
-                progress += 5;
-                progressCircle.style.setProperty('--progress', progress + '%');
-                progressPercentage.textContent = progress + '%';
-
-                // 100%에 도달하면 폼 제출
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    uploadForm.submit(); // 실제 폼 제출
-                }
-            }, 200);
         });
 
         // 오류 메시지 표시 함수 - 통일된 형식의 오류 메시지를 표시
