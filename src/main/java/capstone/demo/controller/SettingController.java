@@ -33,7 +33,7 @@ public class SettingController {
                            HttpSession session) {
         User user = (User) session.getAttribute("logInUser");
 
-        List<CriteriaDto> criteria = settingService.getCriteriasByUser(user);
+        List<CriteriaDto> criteria = settingService.getCriterionByUser(user);
 
         model.addAttribute("criteria", criteria);
         return "settings";
