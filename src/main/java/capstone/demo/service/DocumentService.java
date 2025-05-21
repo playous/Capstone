@@ -16,7 +16,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +47,7 @@ public class DocumentService {
     }
 
     @Transactional
-    public boolean deleteDocument(Long documentId, User user){
+    public boolean deleteDocument(Long documentId){
         Document document = documentRepository.findById(documentId)
                 .orElseThrow(() -> new IllegalArgumentException("문서를 찾을 수 없습니다. ID: " + documentId));
 
@@ -86,13 +88,16 @@ public class DocumentService {
         document.setStatus(DocumentStatus.COMPLETED);
 
         if (resultListDto.getResultList() != null) {
-            for (ResultDto resultItem : resultListDto.getResultList()) {
+            List<ResultDto> sortedResults = resultListDto.getResultList().stream()
+                    .sorted(Comparator.comparing(ResultDto::getLevel).reversed())
+                    .collect(Collectors.toList());
+
+            for (ResultDto resultItem : sortedResults) {
                 SecurityElement element = new SecurityElement();
                 element.setDocument(document);
                 element.setName(resultItem.getName());
                 element.setLevel(resultItem.getLevel());
                 element.setDescription(resultItem.getDescription());
-
                 document.getSecurityElements().add(element);
             }
         }
