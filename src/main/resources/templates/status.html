@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>문서 분석 중 - 문서 보안 등급 평가 시스템</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<!-- 분석 진행 중 화면 -->
+<div class="container">
+    <div class="analysis-screen" id="analysisScreen">
+        <div class="progress-circle" style="--progress: 0%">
+            <div class="progress-percentage">0%</div>
+        </div>
+        <div class="analysis-title">문서 분석 중...</div>
+        <div class="analysis-description">
+            문서의 보안 등급을 평가하고 있습니다.<br>
+            이 과정은 몇 분 정도 소요될 수 있습니다.
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // URL에서 문서 ID 가져오기
+        const pathParts = window.location.pathname.split('/');
+        const documentId = pathParts[pathParts.length - 1];
+
+        // 진행 상태 UI 요소
+        const progressCircle = document.querySelector('.progress-circle');
+        const progressPercentage = document.querySelector('.progress-percentage');
+
+        // 초기 진행률 표시 (0%부터 시작)
+        let currentProgress = 0;
+        updateProgress(currentProgress);
+
+        // 진행률 자동 증가를 위한 인터벌 변수
+        let progressInterval;
+
+        // 진행률 업데이트 함수
+        function updateProgress(percent) {
+            progressCircle.style.setProperty('--progress', percent + '%');
+            progressPercentage.textContent = percent + '%';
+        }
+
+        // 진행률 자동 증가 시작
+        function startProgressAnimation() {
+            progressInterval = setInterval(() => {
+                if (currentProgress < 95) {
+                    currentProgress += 1; // 1초에 1%씩 증가
+                    updateProgress(currentProgress);
+                } else {
+                    // 95%에 도달하면 인터벌 중지
+                    clearInterval(progressInterval);
+                }
+            }, 1000); // 1초 간격
+        }
+
+        // 상태 확인 함수
+        function checkDocumentStatus() {
+            // 서버에 상태 확인 요청
+            fetch(`/api/docs/${documentId}/status`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'COMPLETED') {
+                        // 처리 완료 - 인터벌 중지하고 100% 표시 후 결과 페이지로 이동
+                        clearInterval(progressInterval);
+                        updateProgress(100);
+                        setTimeout(() => {
+                            window.location.href = `/docs/${documentId}`;
+                        }, 500);
+                    } else if (data.status === 'PROCESSING') {
+                        // 처리 중 - 1초 후 다시 상태 확인
+                        setTimeout(checkDocumentStatus, 1000);
+                    }
+                })
+                .catch(error => {
+                    // 통신 오류 - 재시도
+                    setTimeout(checkDocumentStatus, 2000); // 2초 후 재시도
+                });
+        }
+
+        // 진행률 애니메이션 시작
+        startProgressAnimation();
+
+        // 첫 상태 확인 시작
+        checkDocumentStatus();
+    });
+</script>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #F7FAFC;
+        font-family: 'Noto Sans KR', sans-serif;
+    }
+
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100%;
+    }
+
+    /* 분석 화면 스타일 수정 */
+    .analysis-screen {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: white;
+        width: 90%;
+        max-width: 500px;
+        height: 75vh; /* 화면 높이의 3/4 */
+        padding: 30px;
+        border-radius: 12px; /* 모서리 라운드 증가 */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    /* 기존 스타일 유지 */
+    .progress-circle {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: conic-gradient(#8A4FFF var(--progress, 0%), #E2E8F0 0%);
+        margin-bottom: 30px;
+        position: relative;
+    }
+
+    .progress-circle::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100px;
+        height: 100px;
+        background-color: white;
+        border-radius: 50%;
+    }
+
+    .progress-percentage {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 24px;
+        font-weight: 600;
+        color: #1A202C;
+    }
+
+    .analysis-title {
+        font-size: 22px;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    .analysis-description {
+        font-size: 16px;
+        color: #718096;
+        text-align: center;
+        max-width: 400px;
+        margin-bottom: 30px;
+        line-height: 1.6;
+    }
+</style>
+</body>
+</html>
