@@ -52,7 +52,7 @@ public class S3Service {
         return s3Key;
     }
 
-    public String generatePresignedUrl(String s3Key, long expirationTimeMillis) {
+    public String generatePresignedUrl(String s3Key, long expirationTime) {
         // GetObjectRequest 생성
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
@@ -61,7 +61,7 @@ public class S3Service {
 
         // GetObjectPresignRequest 생성
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(expirationTimeMillis))
+                .signatureDuration(Duration.ofMinutes(expirationTime))
                 .getObjectRequest(getObjectRequest)
                 .build();
 
