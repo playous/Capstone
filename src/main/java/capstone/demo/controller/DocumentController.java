@@ -96,21 +96,26 @@ public class DocumentController {
         DocumentViewDto documentViewDto = new DocumentViewDto(document,resultListDto,s3Url,document.getContentType());
 
         log.info("documentViewDto = {}",documentViewDto);
+        model.addAttribute("document", document);
         model.addAttribute("documentView", documentViewDto);
         return "document-view";
     }
 
     @PostMapping("/{id}/delete")
     public String deleteDocument(@PathVariable Long id,
-                                 RedirectAttributes redirectAttributes,
-                                 HttpSession httpSession) {
-        User user = (User) httpSession.getAttribute("logInUser");
-        documentService.deleteDocument(id,user);
+                                 RedirectAttributes redirectAttributes) {
+        documentService.deleteDocument(id);
 
         redirectAttributes.addFlashAttribute("message", "문서가 삭제되었습니다.");
         redirectAttributes.addFlashAttribute("messageType", "success");
 
         return "redirect:/docs/list";
+    }
+
+    @GetMapping("/status/{documentId}")
+    public String checkStatus(@PathVariable Long documentId, Model model) {
+        model.addAttribute("documentId", documentId);
+        return "status";
     }
 
 }
