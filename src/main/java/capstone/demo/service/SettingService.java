@@ -20,7 +20,7 @@ public class SettingService {
 
     private final SecurityCriterionRepository securityCriterionRepository;
 
-    public List<CriteriaDto> getCriteriasByUser(User user) {
+    public List<CriteriaDto> getCriterionByUser(User user) {
         List<SecurityCriterion> criteria = securityCriterionRepository.findByUser(user);
 
         return criteria.stream()
