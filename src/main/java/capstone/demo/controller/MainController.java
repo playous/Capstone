@@ -12,6 +12,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Controller
@@ -45,6 +50,17 @@ public class MainController {
         model.addAttribute("securityLevelCounts", securityLevelCounts);
 
         return "dashboard";
+    }
+
+    @GetMapping("/api/docs/{documentId}/status")
+    @ResponseBody
+    public Map<String, Object> getDocumentStatus(@PathVariable Long documentId) {
+        Document document = documentService.getDocument(documentId);
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("status", document.getStatus());
+
+        return response;
     }
 
 }
