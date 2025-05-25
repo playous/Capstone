@@ -20,7 +20,6 @@
         </div>
     </div>
 </div>
-
 <!-- 메인 대시보드 -->
 <div class="main-container">
     <!-- 왼쪽 사이드바 -->
@@ -43,6 +42,15 @@
                 보안 기준 관리
             </a>
         </div>
+        <div class="spacer"></div>
+
+        <div class="logout-container">
+            <a th:href="@{/logout}" class="logout-button">
+                <div class="logout-text">
+                    로그아웃
+                </div>
+            </a>
+        </div>
     </div>
 
     <!-- 메인 콘텐츠 -->
@@ -63,12 +71,12 @@
                 </form>
             </div>
 
+            <!-- 3단계 필터 버튼으로 변경 -->
             <div class="filter-buttons" style="margin-bottom: 15px;">
                 <a th:href="@{/docs/list}" class="filter-button" th:classappend="${securityLevel == null ? 'active' : ''}">전체</a>
-                <a th:href="@{/docs/list(level=1)}" class="filter-button" th:classappend="${securityLevel == 1 ? 'active' : ''}">1등급</a>
-                <a th:href="@{/docs/list(level=2)}" class="filter-button" th:classappend="${securityLevel == 2 ? 'active' : ''}">2등급</a>
-                <a th:href="@{/docs/list(level=3)}" class="filter-button" th:classappend="${securityLevel == 3 ? 'active' : ''}">3등급</a>
-                <a th:href="@{/docs/list(level=4)}" class="filter-button" th:classappend="${securityLevel == 4 ? 'active' : ''}">4등급</a>
+                <a th:href="@{/docs/list(level=1)}" class="filter-button" th:classappend="${securityLevel == 1 ? 'active' : ''}">1급</a>
+                <a th:href="@{/docs/list(level=2)}" class="filter-button" th:classappend="${securityLevel == 2 ? 'active' : ''}">2급</a>
+                <a th:href="@{/docs/list(level=3)}" class="filter-button" th:classappend="${securityLevel == 3 ? 'active' : ''}">3급</a>
             </div>
 
             <table>
@@ -114,10 +122,10 @@
                    th:class="${documents.first ? 'disabled' : ''}">&lt; 이전</a>
 
                 <span th:each="i : ${#numbers.sequence(0, documents.totalPages - 1)}">
-                        <a th:href="@{/docs/list/{page}(page=${i}, level=${param.level}, query=${param.query})}"
-                           th:text="${i + 1}"
-                           th:class="${i == documents.number ? 'active' : ''}"></a>
-                    </span>
+                    <a th:href="@{/docs/list/{page}(page=${i}, level=${param.level}, query=${param.query})}"
+                       th:text="${i + 1}"
+                       th:class="${i == documents.number ? 'active' : ''}"></a>
+                </span>
 
                 <a th:href="@{/docs/list/{page}(page=${documents.number + 1}, level=${param.level}, query=${param.query})}"
                    th:class="${documents.last ? 'disabled' : ''}">다음 &gt;</a>
@@ -125,7 +133,6 @@
         </div>
     </div>
 </div>
-
 <script th:src="@{/js/documents.js}"></script>
 </body>
 </html>

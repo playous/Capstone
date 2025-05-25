@@ -1,9 +1,9 @@
 /* 기본 스타일 */
-* {
+
+*{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Malgun Gothic', 'Segoe UI', sans-serif;
 }
 
 body {
@@ -13,11 +13,9 @@ body {
     display: flex;
     flex-direction: column;
 }
-
 .hidden {
     display: none !important;
 }
-
 /* 상단 네비게이션 */
 .top-nav {
     display: flex;
@@ -29,12 +27,10 @@ body {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     z-index: 10;
 }
-
 .logo {
     display: flex;
     align-items: center;
 }
-
 .logo-icon {
     width: 36px;
     height: 36px;
@@ -48,39 +44,33 @@ body {
     font-size: 15px;
     font-weight: bold;
 }
-
 .logo-text {
     font-size: 18px;
     font-weight: 600;
     color: #1A202C;
 }
-
 .nav-actions {
     display: flex;
     align-items: center;
     gap: 20px;
 }
-
 .user-profile {
     display: flex;
     align-items: center;
     gap: 8px;
 }
-
 .avatar {
     width: 32px;
     height: 32px;
     border-radius: 50%;
     background-color: #F0E7FF;
 }
-
 /* 메인 레이아웃 */
 .main-container {
     display: flex;
     flex: 1;
     overflow: hidden;
 }
-
 /* 왼쪽 사이드바 */
 .sidebar {
     width: 250px;
@@ -89,11 +79,9 @@ body {
     display: flex;
     flex-direction: column;
 }
-
 .sidebar-menu {
     padding: 20px 0;
 }
-
 .menu-item {
     padding: 12px 20px;
     display: flex;
@@ -104,12 +92,10 @@ body {
     font-size: 14px;
     text-decoration: none;
 }
-
 .menu-item:hover, .menu-item.active {
     background-color: #F0E7FF;
     color: #8A4FFF;
 }
-
 .menu-item-icon {
     width: 20px;
     height: 20px;
@@ -117,19 +103,16 @@ body {
     align-items: center;
     justify-content: center;
 }
-
 .content {
     flex: 1;
     padding: 20px;
     overflow-y: auto;
 }
-
 .page-title {
     font-size: 22px;
     font-weight: 600;
     margin-bottom: 20px;
 }
-
 .welcome-banner {
     background: linear-gradient(135deg, #8A4FFF 20%, #A67BFF 70%);
     padding: 30px;
@@ -137,18 +120,15 @@ body {
     margin-bottom: 30px;
     color: white;
 }
-
 .welcome-title {
     font-size: 24px;
     font-weight: 600;
     margin-bottom: 10px;
 }
-
 .welcome-text {
     font-size: 14px;
     opacity: 0.9;
 }
-
 /* 업로드 영역 */
 .upload-area {
     background-color: white;
@@ -157,7 +137,6 @@ body {
     margin-bottom: 30px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
-
 .dropzone {
     border: 2px dashed #E2E8F0;
     border-radius: 6px;
@@ -165,39 +144,32 @@ body {
     text-align: center;
     cursor: pointer;
 }
-
 .dropzone.dragover {
     background-color: #F0E7FF;
     border-color: #8A4FFF;
 }
-
 .dropzone-icon {
     font-size: 40px;
     color: #8A4FFF;
     margin-bottom: 15px;
 }
-
 .dropzone-text {
     font-size: 14px;
     color: #718096;
     margin-bottom: 10px;
 }
-
 .browse-button {
     display: inline-block;
     color: #8A4FFF;
     text-decoration: underline;
     cursor: pointer;
 }
-
 .file-input {
     display: none;
 }
-
 .form-group {
     margin-bottom: 20px;
 }
-
 .form-label {
     display: block;
     margin-bottom: 8px;
@@ -205,7 +177,6 @@ body {
     font-weight: 500;
     color: #4A5568;
 }
-
 .form-input {
     width: 100%;
     padding: 10px 12px;
@@ -213,12 +184,10 @@ body {
     border-radius: 6px;
     font-size: 14px;
 }
-
 .form-input:focus {
     outline: none;
     border-color: #8A4FFF;
 }
-
 .login-button {
     width: 100%;
     padding: 12px;
@@ -231,11 +200,9 @@ body {
     cursor: pointer;
     margin-bottom: 20px;
 }
-
 .login-button:hover {
     background-color: #7442DF;
 }
-
 /* 문서 목록 */
 .documents-list {
     background-color: white;
@@ -243,41 +210,35 @@ body {
     padding: 20px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
-
 .list-header {
     display: flex;
     justify-content: space-between;
     margin-bottom: 15px;
 }
-
 .filter-buttons {
     display: flex;
     gap: 10px;
 }
-
 .filter-button {
     padding: 8px 14px;
     border-radius: 20px;
     font-size: 13px;
-    border: none; /* 테두리 제거 */
-    background-color: #EAEDF0; /* 회색 배경 */
+    border: none;
+    background-color: #EAEDF0; / 회색 배경 */
     cursor: pointer;
     text-decoration: none;
     color: #4A5568;
     transition: all 0.2s ease;
     font-weight: 500;
 }
-
 .filter-button.active {
     background-color: #4B57EF;
     color: white;
     border-color: #4B57EF;
 }
-
 .search-box {
     position: relative;
 }
-
 .search-input {
     padding: 8px 14px 8px 36px;
     border-radius: 6px;
@@ -286,7 +247,6 @@ body {
     background-color: #F8F9FC;
     width: 250px;
 }
-
 .search-icon {
     position: absolute;
     left: 12px;
@@ -297,17 +257,14 @@ body {
     border: none;
     cursor: pointer;
 }
-
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 15px;
 }
-
 thead {
     background-color: #F9FAFC;
 }
-
 th {
     padding: 12px 15px;
     text-align: left;
@@ -315,17 +272,14 @@ th {
     font-weight: 600;
     color: #4A5568;
 }
-
 td {
     padding: 12px 15px;
     font-size: 13px;
     border-top: 1px solid #E5E9F2;
 }
-
 tr:hover {
     background-color: #F9FAFC;
 }
-
 .security-tag {
     display: inline-block;
     width: 24px;
@@ -338,23 +292,15 @@ tr:hover {
     color: white;
     margin-right: 15px;
 }
-
 .security-1 {
-    background-color: #10B981; /* 낮은 등급 - 초록 */
+background-color: #EF4444; / 최고 등급 (기밀) - 빨강 */
 }
-
 .security-2 {
-    background-color: #3B82F6; /* 중간 낮은 등급 - 파랑 */
+    background-color: #F59E0B; /* 중간 등급 (민감) - 주황 */
 }
-
 .security-3 {
-    background-color: #F59E0B; /* 중간 높은 등급 - 주황 */
+    background-color: #10B981; /* 낮은 등급 (일반) - 초록 */
 }
-
-.security-4 {
-    background-color: #EF4444; /* 높은 등급 - 빨강 */
-}
-
 .status-indicator {
     display: inline-block;
     width: 8px;
@@ -362,15 +308,12 @@ tr:hover {
     border-radius: 50%;
     margin-right: 6px;
 }
-
 .status-processing {
     background-color: #F59E0B;
 }
-
 .status-completed {
     background-color: #10B981;
 }
-
 .action-button {
     padding: 6px 12px;
     border-radius: 4px;
@@ -383,11 +326,9 @@ tr:hover {
     display: inline-block;
     font-weight: 500;
 }
-
 .action-button:hover {
     background-color: #e8eaed;
 }
-
 /* 분석 진행 중 화면 */
 .analysis-screen {
     flex: 1;
@@ -397,7 +338,6 @@ tr:hover {
     justify-content: center;
     background-color: white;
 }
-
 .progress-circle {
     width: 120px;
     height: 120px;
@@ -406,7 +346,6 @@ tr:hover {
     margin-bottom: 30px;
     position: relative;
 }
-
 .progress-circle::before {
     content: '';
     position: absolute;
@@ -418,7 +357,6 @@ tr:hover {
     background-color: white;
     border-radius: 50%;
 }
-
 .progress-percentage {
     position: absolute;
     top: 50%;
@@ -428,13 +366,11 @@ tr:hover {
     font-weight: 600;
     color: #1A202C;
 }
-
 .analysis-title {
     font-size: 20px;
     font-weight: 600;
     margin-bottom: 15px;
 }
-
 .analysis-description {
     font-size: 14px;
     color: #718096;
@@ -442,20 +378,17 @@ tr:hover {
     max-width: 400px;
     margin-bottom: 30px;
 }
-
 /* 문서 상세 화면 */
 .document-detail {
     display: flex;
     flex: 1;
 }
-
 .document-viewer {
     flex: 1;
     background-color: #FFFFFF;
     display: flex;
     flex-direction: column;
 }
-
 .document-toolbar {
     display: flex;
     justify-content: space-between;
@@ -464,17 +397,14 @@ tr:hover {
     background-color: #F9FAFC;
     border-bottom: 1px solid #E5E9F2;
 }
-
 .document-title {
     font-size: 16px;
     font-weight: 600;
 }
-
 .toolbar-actions {
     display: flex;
     gap: 10px;
 }
-
 .toolbar-button {
     padding: 6px 12px;
     border-radius: 4px;
@@ -485,12 +415,9 @@ tr:hover {
     text-decoration: none;
     color: #4A5568;
 }
-
 .toolbar-button:hover {
     background-color: #F0F4F8;
 }
-
-
 .document-page {
     background-color: white;
     width: 100%;
@@ -498,12 +425,10 @@ tr:hover {
     padding: 30px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
-
 .document-image {
     width: 100%;
     border: 1px solid #E5E9F2;
 }
-
 /* 분석 패널 */
 .analysis-panel {
     width: 320px;
@@ -512,31 +437,27 @@ tr:hover {
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    height: calc(100vh - 120px);
 }
-
 .analysis-header {
     padding: 20px;
     border-bottom: 1px solid #E5E9F2;
 }
-
 .analysis-title {
     font-size: 16px;
     font-weight: 600;
     margin-bottom: 5px;
 }
-
 .analysis-date {
     font-size: 13px;
     color: #718096;
 }
-
 .security-rating {
     display: flex;
     align-items: center;
     padding: 20px;
     border-bottom: 1px solid #E5E9F2;
 }
-
 .rating-circle {
     width: 60px;
     height: 60px;
@@ -549,69 +470,57 @@ tr:hover {
     color: white;
     margin-right: 15px;
 }
-
 .rating-info {
     flex: 1;
 }
-
 .rating-label {
     font-size: 14px;
     font-weight: 600;
     margin-bottom: 5px;
 }
-
 .rating-description {
     font-size: 13px;
     color: #4A5568;
 }
-
 .analysis-sections {
     padding: 20px;
     overflow-y: auto;
     flex: 1;
 }
-
 .section-title {
     font-size: 14px;
     font-weight: 600;
     margin-bottom: 15px;
     color: #1a202c;
 }
-
 .section-title-list {
     font-size: 14px;
     font-weight: 600;
     color: #1a202c;
 }
-
 .section-item {
     padding: 12px;
     border-radius: 6px;
     background-color: #F9FAFC;
     margin-bottom: 10px;
 }
-
 .section-header {
     display: flex;
     justify-content: space-between;
     margin-bottom: 5px;
 }
-
 .section-name {
     font-size: 13px;
     font-weight: 500;
     color: #1A202C;
 }
-
 .section-description {
     font-size: 12px;
     color: #4A5568;
 }
-
 .highlight-area {
     margin-top: 25px;
 }
-
 .highlight-item {
     display: flex;
     padding: 10px;
@@ -620,7 +529,6 @@ tr:hover {
     border: 1px solid rgba(239, 68, 68, 0.2);
     margin-bottom: 10px;
 }
-
 .highlight-marker {
     width: 12px;
     height: 12px;
@@ -629,65 +537,53 @@ tr:hover {
     margin-right: 10px;
     margin-top: 3px;
 }
-
 .highlight-content {
     flex: 1;
     font-size: 12px;
 }
-
 .highlight-field {
     font-weight: 600;
     margin-bottom: 3px;
 }
-
 .highlight-reason {
     color: #718096;
 }
-
 .action-buttons {
     padding: 20px;
     border-top: 1px solid #E5E9F2;
 }
-
 .approve-button {
     background-color: #8A4FFF;
     color: white;
     border: none;
 }
-
 .approve-button:hover {
     background-color: #7442DF;
 }
-
 .reject-button {
     background-color: #FFFFFF;
     color: #EF4444;
     border: 1px solid #EF4444;
 }
-
 .reject-button:hover {
     background-color: #FEF2F2;
 }
-
 /* 알림 메시지 */
 .alert {
     padding: 15px;
     border-radius: 6px;
     margin-bottom: 20px;
 }
-
 .alert-success {
     background-color: #D1FAE5;
     border: 1px solid #34D399;
     color: #065F46;
 }
-
 .alert-error {
     background-color: #FEE2E2;
     border: 1px solid #F87171;
     color: #B91C1C;
 }
-
 /* 페이지네이션 */
 .pagination {
     display: flex;
@@ -695,7 +591,6 @@ tr:hover {
     margin-top: 20px;
     gap: 5px;
 }
-
 .pagination a {
     padding: 8px 12px;
     border-radius: 4px;
@@ -704,19 +599,16 @@ tr:hover {
     text-decoration: none;
     font-size: 13px;
 }
-
 .pagination a.active {
     background-color: #8A4FFF;
     color: white;
     border-color: #8A4FFF;
 }
-
 .pagination a.disabled {
     background-color: #F9FAFC;
     color: #CBD5E0;
     cursor: not-allowed;
 }
-
 /* 빈 상태 메시지 */
 .empty-message {
     text-align: center;
@@ -724,11 +616,9 @@ tr:hover {
     color: #718096;
     font-size: 14px;
 }
-
 .text-center {
     text-align: center;
 }
-
 /* 로고 아이콘 내 텍스트 */
 .logo-icon-inner {
     display: flex;
@@ -740,47 +630,40 @@ tr:hover {
     font-weight: bold;
 }
 
-/* 로그아웃 컨테이너 */
 .logout-container {
-    width: 100%;
-    margin-bottom: 30px;
-    display: flex;
-    justify-content: center;
-    margin-top: 20px; /* 위 요소와의 간격 */
-    padding: 10px 0; /* 상하 여백 */
+width: 100%;
+margin-bottom: 30px;
+display: flex;
+justify-content: center;
+margin-top: 20px;
+padding: 10px 0;
 }
-
-/* 로그아웃 버튼 */
 .logout-button {
-    display: block;
-    width: 75%; /* 사이드바 폭의 75% */
-    background-color: #ffe6e6;  /* 연한 보라색 */
-    color: #c53030;
-    border-radius: 10px;
-    padding: 8px 15px;
-    text-align: center;
-    text-decoration: none;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    font-weight: 500; /* 약간 두꺼운 글꼴 */
+display: block;
+width: 75%;
+background-color: #ffe6e6;
+color: #c53030;
+border-radius: 10px;
+padding: 8px 15px;
+text-align: center;
+text-decoration: none;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+font-weight: 500;
 }
-
 .logout-button:hover {
     background-color: #ffd6d6;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
 .logout-text {
     display: flex;
     align-items: center;
     justify-content: center;
 }
-
 .spacer {
-    flex-grow: 1; /* 이 요소가 가능한 모든 공간을 차지하도록 설정 */
-    min-height: 20px; /* 최소한의 높이 */
+    flex-grow: 1;
+    min-height: 20px;
 }
-
 .delete-button {
     background-color: #fce8e6;
     color: #ea4335;
@@ -791,7 +674,6 @@ tr:hover {
     font-size: 14px;
     font-weight: 500;
 }
-
 .delete-button:hover {
     background-color: #fad2cf;
 }

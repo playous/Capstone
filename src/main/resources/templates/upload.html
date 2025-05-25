@@ -63,7 +63,7 @@
                     <div class="dropzone-text">파일을 끌어서 놓거나 클릭하여 선택하세요</div>
                     <div class="browse-button">파일 찾기</div>
                     <input type="file" name="file" class="file-input" id="fileInput">
-                    <div style="margin-top: 10px; font-size: 12px; color: #718096;">* 지원 파일 형식: txt, pdf, jpg, jepg, png, hwp, word(doc, docx)</div>
+                    <div style="margin-top: 10px; font-size: 12px; color: #718096;">* 지원 파일 형식: txt, pdf, jpg, jpeg, png, hwp, word(doc, docx)</div>
                 </div>
             </div>
 
@@ -100,6 +100,13 @@
             'application/haansofthwp'  // hwp
         ];
 
+        // 파일 확장자로도 체크하는 함수 추가
+        function isValidFileExtension(fileName) {
+            const validExtensions = ['.txt', '.pdf', '.jpg', '.jpeg', '.png', '.hwp', '.doc', '.docx'];
+            const fileExtension = fileName.toLowerCase().substring(fileName.lastIndexOf('.'));
+            return validExtensions.includes(fileExtension);
+        }
+
         // 드롭존 클릭 시 파일 선택 다이얼로그 표시
         dropzone.addEventListener('click', () => {
             fileInput.click();
@@ -113,31 +120,41 @@
             }
         });
 
-        // 폼 제출 시 처리
+        // 폼 제출 시 처리 - 중요한 수정 부분!
         uploadForm.addEventListener('submit', function(e) {
+            // 먼저 기본 제출 동작을 막습니다
+            e.preventDefault();
 
             // 파일 유효성 검사
             if (!fileInput.files || fileInput.files.length === 0) {
-                // 동일한 오류 메시지 형식으로 표시
                 showErrorMessage("파일을 선택해주세요.");
-                return false;
+                return;
             }
 
             // 제목 유효성 검사
             const title = uploadForm.querySelector('input[name="title"]').value;
             if (!title || title.trim() === '') {
-                // 동일한 오류 메시지 형식으로 표시
                 showErrorMessage("문서 제목을 입력해주세요.");
-                return false;
+                return;
             }
 
-            // 파일 형식 검사 (클라이언트 측에서 미리 검사)
+            // 파일 형식 검사 (MIME 타입과 확장자 둘 다 체크)
             const file = fileInput.files[0];
-            if (file && !supportedFileTypes.includes(file.type)) {
-                // 동일한 오류 메시지 형식으로 표시
-                showErrorMessage("지원하지 않는 파일 형식입니다.");
-                return false;
+            if (file) {
+                // MIME 타입 체크
+                const isValidMimeType = supportedFileTypes.includes(file.type);
+                // 확장자 체크
+                const isValidExtension = isValidFileExtension(file.name);
+
+                // 둘 중 하나라도 유효하지 않으면 에러
+                if (!isValidMimeType && !isValidExtension) {
+                    showErrorMessage("지원하지 않는 파일 형식입니다. (지원 형식: txt, pdf, jpg, jpeg, png, hwp, doc, docx)");
+                    return;
+                }
             }
+
+            // 모든 유효성 검사를 통과하면 폼을 제출합니다
+            uploadForm.submit();
         });
 
         // 오류 메시지 표시 함수 - 통일된 형식의 오류 메시지를 표시
@@ -164,6 +181,9 @@
             // 알림 메시지를 페이지 제목 바로 아래에 삽입
             const pageTitle = document.querySelector('.page-title');
             pageTitle.insertAdjacentElement('afterend', alertDiv);
+
+            // 스크롤을 위로 올려서 오류 메시지가 보이도록 함
+            window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
         // 드래그 앤 드롭 기능
@@ -279,6 +299,9 @@
         margin-bottom: 15px;
     }
 
+
+
+
     .browse-button {
         display: inline-block;
         color: #8A4FFF;
@@ -342,3 +365,4 @@
 </style>
 </body>
 </html>
+
