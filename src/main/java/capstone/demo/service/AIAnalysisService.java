@@ -31,7 +31,6 @@ public class AIAnalysisService {
     @Value("${api.ai.endPoint}")
     private String aiEndpoint;
 
-    @Async
     public CompletableFuture<ResultListDto> analyzeDocument(Long documentId) {
         log.info("문서 보안 등급 시작 : {}", documentId);
 
